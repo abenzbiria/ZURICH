@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="rubrique_rubrique_tree">
+            <field name="name">rubrique.rubrique.tree</field>
+            <field name="model">rubrique.rubrique</field>
+            <field name="arch" type="xml">
+                <tree string="Rubriques">
+                    <field name="name"/>
+                    <field name="parent_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="rubrique_rubrique_form">
+            <field name="name">rubrique.rubrique.form</field>
+            <field name="model">rubrique.rubrique</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form string="Rubrique">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="parent_id"/>
+                        </group>
+                    </group>
+
+                    <separator string="Status" />
+                    <group>
+                        <field name="stage_ids" nolabel="1"/>
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+        <record id="rubrique_rubrique_act" model="ir.actions.act_window">
+            <field name="name">Rubriques</field>
+            <field name="res_model">rubrique.rubrique</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="rubrique_rubrique_tree"/>
+        </record>
+
+        <menuitem id="menu_rubrique_rubrique" name="Rubriques"
+            groups="purchase.group_purchase_manager"
+            action="rubrique_rubrique_act"
+            parent="purchase.menu_purchase_config_purchase" sequence="1"/>
+
+
+    </data>
+</openerp>

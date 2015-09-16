@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="purchase_order_stage_tree">
+            <field name="name">purchase.order.stage.tree</field>
+            <field name="model">purchase.order.stage</field>
+            <field name="arch" type="xml">
+                <tree string="Status">
+                    <field name="sequence"/>
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="purchase_order_stage_form">
+            <field name="name">purchase.order.stage.form</field>
+            <field name="model">purchase.order.stage</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form string="Status">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    
+                    <separator string="Rubriques" />
+                    <group>
+                        <field name="rubrique_ids" nolabel="1"/>
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+        <record id="purchase_order_stage_act" model="ir.actions.act_window">
+            <field name="name">Status</field>
+            <field name="res_model">purchase.order.stage</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="purchase_order_stage_tree"/>
+        </record>
+
+        <menuitem id="menu_purchase_order_stage" name="Statut des BC"
+            groups="purchase.group_purchase_manager"
+            action="purchase_order_stage_act"
+            parent="purchase.menu_purchase_config_purchase" sequence="0"/>
+
+
+        <record id="purchase_order_form_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']" position="before">
+                    <field name="rubrique_id"/>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>
