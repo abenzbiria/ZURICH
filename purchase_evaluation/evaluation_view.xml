@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8'?>
+<openerp>
+    <data>
+            
+            <record model="ir.ui.view" id="purchase_order_evaluation_form_inherit">
+                <field name="name">purchase.order.evaluation.iniherit.form</field>
+                <field name="model">purchase.order</field>
+                <field name="type">form</field>
+                <field name="inherit_id" ref="purchase.purchase_order_form"/>
+                <field name="arch" type="xml">
+                       <xpath expr="//page[@string='Deliveries &amp; Invoices']" position="after">
+
+                            <!-- page string="Evaluation" attrs="{'invisible':[('state','not in','approved')]}" -->
+                            <page string="Evaluation">
+                            <field name="evaluation_ids">
+                                <tree string="Purchase Evaluation Lines" editable="bottom">
+                                    <field name="evaluation_id"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                            </page>
+
+                       </xpath>
+				</field>
+            </record>
+
+            <record model="ir.ui.view" id="res_partner_evaluation_form_view">
+                <field name="name">res.partner.evaluation.form</field>
+                <field name="model">res.partner</field>
+                <field name="type">form</field>
+                <field name="inherit_id" ref="base.view_partner_form"/>
+                <field name="arch" type="xml">
+
+                	<xpath expr="//page[@string='Sales &amp; Purchases']" position="after">
+
+                        <page string="Evaluation" attrs="{'invisible':[('supplier','=',False)]}">
+                            <field name="evaluation_ids">
+                                <tree string="Purchase Evaluation Lines" editable="bottom" create="false" delete="false">
+                                    <field name="evaluation_id"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                            </page>
+
+                	</xpath>
+
+                </field>
+		</record>
+
+        <record id="view_purchase_evaluation_form" model="ir.ui.view">
+            <field name="name">purchase.evaluation.form</field>
+            <field name="model">purchase.evaluation</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+              <form string="Evaluation">
+                    <group>
+                        <field name="name"/>
+                    </group>
+              </form>
+		    </field>
+         </record>
+
+         <record id="view_purchase_evaluation_tree" model="ir.ui.view">
+            <field name="name">purchase.evaluation.tree</field>
+            <field name="model">purchase.evaluation</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+              <tree string="Evaluation">
+                    <field name="name"/>
+              </tree>
+		    </field>
+         </record>
+
+
+        <record model="ir.actions.act_window" id="action_purchase_evaluation">
+            <field name="name">Evaluation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">purchase.evaluation</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+        id="menu_purchase_evaluation"
+        sequence="20"
+        parent="purchase.menu_procurement_management"
+        action="action_purchase_evaluation"/>
+
+	</data>
+</openerp>
