@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="purchase_budget_tree">
+            <field name="name">purchase.budget.tree</field>
+            <field name="model">purchase.budget</field>
+            <field name="arch" type="xml">
+                <tree string="Budgets">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="purchase_budget_form">
+            <field name="name">purchase.budget.form</field>
+            <field name="model">purchase.budget</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form string="Budgets">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </group>
+
+                    <separator string="Rubriques" />
+                    <group>
+                        <field name="rubrique_ids" nolabel="1"/>
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+        <record id="purchase_budget_act" model="ir.actions.act_window">
+            <field name="name">Budgets</field>
+            <field name="res_model">purchase.budget</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="purchase_budget_tree"/>
+        </record>
+
+        <menuitem id="menu_purchase_budget" name="Budgets"
+            groups="purchase.group_purchase_manager"
+            action="purchase_budget_act"
+            parent="purchase.menu_purchase_config_purchase" sequence="1"/>
+
+
+    </data>
+</openerp>
