@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rubrique_user,access_rubrique_user,model_rubrique_rubrique,purchase_requisition.group_purchase_requisition_user,1,1,0,0
+access_rubrique_manager,access_rubrique_manager,model_rubrique_rubrique,purchase_requisition.group_purchase_requisition_manager,1,1,1,1
+access_stage_manager,access_stage_manager,model_purchase_order_stage,purchase_requisition.group_purchase_requisition_manager,1,1,1,1
+access_stage_user,access_stage_user,model_purchase_order_stage,purchase_requisition.group_purchase_requisition_user,1,1,0,0

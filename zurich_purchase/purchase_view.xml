@@ -59,6 +59,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='company_id']" position="before">
                     <field name="rubrique_id" on_change="onchange_rubrique_id(rubrique_id)"/>
+                   <!-- <field name='stage' widget='selection'/>-->
                 </xpath>
                 <xpath expr="//field[@name='state']" position="attributes">
                     <attribute name="options">{'fold_field': 'fold'}</attribute>

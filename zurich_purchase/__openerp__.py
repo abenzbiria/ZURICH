@@ -44,8 +44,9 @@
     ]
 , "init_xml"    : []
 , "demo_xml"    : []
-, "update_xml"  : 
-    [ 'purchase_view.xml',
+, "update_xml"  : [
+    'ir.model.access.csv',
+    'purchase_view.xml',
       'rubrique_view.xml',
       'budget_view.xml',
 'purchase_requisition_view.xml',

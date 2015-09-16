@@ -9,22 +9,39 @@ from openerp import models ,fields ,api, _
 from openerp.tools.translate import _
 from datetime import datetime
 
+class purchase_requisition(osv.osv):
+    _inherit = "purchase.requisition"
+
+    def _prepare_purchase_order(self, cr, uid, requisition, supplier, context=None):
+        supplier_pricelist = supplier.property_product_pricelist_purchase
+        return {
+            'origin': requisition.name,
+            'rubrique_id':requisition.rubrique_id.id,
+            'date_order': requisition.date_end or fields.datetime.now(),
+            'partner_id': supplier.id,
+            'pricelist_id': supplier_pricelist.id,
+            'currency_id': supplier_pricelist and supplier_pricelist.currency_id.id or requisition.company_id.currency_id.id,
+            'location_id': requisition.procurement_id and requisition.procurement_id.location_id.id or requisition.picking_type_id.default_location_dest_id.id,
+            'company_id': requisition.company_id.id,
+            'fiscal_position': supplier.property_account_position and supplier.property_account_position.id or False,
+            'requisition_id': requisition.id,
+            'notes': requisition.description,
+            'picking_type_id': requisition.picking_type_id.id
+        }
+
+    budget_id = fields.Many2one(comodel_name="purchase.budget",required=True,string="Budget")
+    rubrique_id= fields.Many2one(comodel_name="rubrique.rubrique",required=True,string="Rubrique")
+    responsible_id = fields.Many2one(string="Responsable", comodel_name="res.users")
+    department_id = fields.Many2one(comodel_name="hr.department",required=True,string="Département origine")
 
 class purchase_order(osv.osv):
 
     _inherit = "purchase.order"
 
 
-    state = fields.Many2one(string="Statut", comodel_name="purchase.order.stage",domain="[('rubrique_ids','=',rubrique_id)]")
+    state = fields.Many2one(string="Statut", comodel_name="purchase.order.stage",default=11)
     rubrique_id = fields.Many2one(comodel_name="rubrique.rubrique", string="Rubrique",default=1)
 
-    # @api.onchange('rubrique_id')
-    # def get_selection(self):
-    #     rubrique = self.rubrique_id
-    #     ids = [x.id for x in rubrique.stage_ids]
-    #     domain=[('id','in',tuple(ids))]
-    #     self.rubrique_id = rubrique.id
-    #     return {'domain':{'state':domain}}
 
     def onchange_rubrique_id(self,cr,uid,ids,rubrique_id,context=None):
         if not rubrique_id:
