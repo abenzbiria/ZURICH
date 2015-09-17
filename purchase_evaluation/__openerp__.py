@@ -25,14 +25,16 @@
     "name": "Evaluation des achats",
     'website': 'http://www.kazacube.com',
     "version": "1.0",
-    "depends": ['base','purchase'],
+    "depends": ['base','purchase','purchase_requisition'],
     "author": "Kazacube",
     "category": "category",
     "description": """
     
     """,
     "init_xml": [],
-    'update_xml': ['evaluation_view.xml',],
+    'update_xml': [
+        'ir.model.access.csv',
+        'evaluation_view.xml',],
     'data': [],
     'demo_xml': [],
     'installable': True,

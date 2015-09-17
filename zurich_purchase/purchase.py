@@ -10,6 +10,7 @@ from openerp.tools.translate import _
 from datetime import datetime
 
 class purchase_requisition(osv.osv):
+
     _inherit = "purchase.requisition"
 
     def _prepare_purchase_order(self, cr, uid, requisition, supplier, context=None):
@@ -48,6 +49,15 @@ class purchase_requisition(osv.osv):
                     user_id = self.department_id.manager_id.user_id.id
         self.responsible_id = user_id
 
+    @api.onchange('budget_id')
+    def onchange_budget_id(self):
+        user_id = False
+        if self.budget_id:
+            rubrique_ids = self.budget_id.rubrique_ids
+            ids = [x.id for x in rubrique_ids]
+            domain = [('id','in',tuple(ids))]
+            return {'domain':{'rubrique_id':domain}}
+
 
 
 class purchase_order(osv.osv):
@@ -79,33 +89,6 @@ class purchase_order(osv.osv):
 
         return super(purchase_order, self).copy(cr, uid, id, default, context=context)
 
-    def wkf_confirm_order(self, cr, uid, ids, context=None):
-        todo = []
-        for po in self.browse(cr, uid, ids, context=context):
-            if not any(line.state != 'cancel' for line in po.order_line):
-                raise osv.except_osv(_('Error!'),_('You cannot confirm a purchase order without any purchase order line.'))
-            if po.invoice_method == 'picking' and not any([l.product_id and l.product_id.type in ('product', 'consu') and l.state != 'cancel' for l in po.order_line]):
-                raise osv.except_osv(
-                    _('Error!'),
-                    _("You cannot confirm a purchase order with Invoice Control Method 'Based on incoming shipments' that doesn't contain any stockable item."))
-            for line in po.order_line:
-                if line.state=='draft':
-                    todo.append(line.id)
-            ######################KAZACUBE##################
-            stage_ids = po.rubrique_id and po.rubrique_id.stage_ids or False
-            if po.internal_state and po.internal_state.is_start:
-                raise osv.except_osv(_('Attention'),_("Cette demande de prix nécessite une validation interne"))
-            ####################FIN KAZACUBE###################"
-        self.pool.get('purchase.order.line').action_confirm(cr, uid, todo, context)
-        for id in ids:
-            self.write(cr, uid, [id], {'state' : 'confirmed', 'validator' : uid})
-        return True
-
-    # def wkf_approve_order(self, cr, uid, ids, context=None):
-    #     print "22222222222222222222222222"
-    #     from openerp.osv import fields, osv
-    #     self.write(cr, uid, ids, {'state': 'approved', 'date_approve': fields.date.context_today(self,cr,uid,context=context)})
-    #     return True
 
     @api.multi
     def first_validation(self):

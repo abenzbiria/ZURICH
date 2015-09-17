@@ -87,7 +87,11 @@ class purchase_order(osv.osv):
             for line in po.order_line:
                 if line.state=='draft':
                     todo.append(line.id)
-
+            ######################KAZACUBE##################
+            stage_ids = po.rubrique_id and po.rubrique_id.stage_ids or False
+            if po.internal_state and po.internal_state.is_start:
+                raise osv.except_osv(_('Attention'),_("Cette demande de prix nécessite une validation interne"))
+            ####################FIN KAZACUBE###################"
             for eval in po.evaluation_ids:
                 if eval.note<0 or eval.note>10:
                     raise osv.except_osv(_('Error!'),_('Note de critère non autorisé (note comprise entre 0 et 10) .'))

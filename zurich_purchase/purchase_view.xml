@@ -61,7 +61,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='company_id']" position="before">
                     <field name="rubrique_id" />
-                    <field name="is_validate_visible" />
+                    <field name="is_validate_visible" invisible="1" />
                 </xpath>
                 <xpath expr="//field[@name='state']" position="after">
                     <button name="first_validation" attrs="{'invisible': [('is_validate_visible','=',False)]}" string="Validation Interne" type="object"/>
