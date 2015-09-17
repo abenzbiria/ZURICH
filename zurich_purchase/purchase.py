@@ -14,9 +14,14 @@ class purchase_requisition(osv.osv):
 
     def _prepare_purchase_order(self, cr, uid, requisition, supplier, context=None):
         supplier_pricelist = supplier.property_product_pricelist_purchase
+        start_id = False
+        for stage in requisition.rubrique_id.stage_ids:
+            if stage.is_start:
+                start_id = stage.id
         return {
             'origin': requisition.name,
             'rubrique_id':requisition.rubrique_id.id,
+            'internal_state':start_id,
             'date_order': requisition.date_end or fields.datetime.now(),
             'partner_id': supplier.id,
             'pricelist_id': supplier_pricelist.id,
@@ -49,10 +54,30 @@ class purchase_order(osv.osv):
 
     _inherit = "purchase.order"
 
+    @api.multi
+    @api.depends('state','internal_state')
+    def get_is_visible(self):
+        is_visible= False
+        if self.state == "draft" and self.internal_state.is_start:
+            is_visible = True
+        self.is_validate_visible = is_visible
+
 
     internal_state = fields.Many2one(string="Statut Interne", comodel_name="purchase.order.stage",domain="[('rubrique_ids','=',rubrique_id)]")
     rubrique_id = fields.Many2one(comodel_name="rubrique.rubrique", string="Rubrique")
+    is_validate_visible = fields.Boolean("Visible",compute=get_is_visible)
 
+    def copy(self, cr, uid, id, default=None, context=None, done_list=None, local=False):
+        default = {} if default is None else default.copy()
+        po = self.browse(cr, uid, id, context=context)
+        start_id = False
+        if po.rubrique_id:
+            for stage in po.rubrique_id.stage_ids:
+                if stage.is_start:
+                    start_id = stage.id
+        default['internal_state']=start_id
+
+        return super(purchase_order, self).copy(cr, uid, id, default, context=context)
 
     def wkf_confirm_order(self, cr, uid, ids, context=None):
         todo = []
@@ -68,30 +93,46 @@ class purchase_order(osv.osv):
                     todo.append(line.id)
             ######################KAZACUBE##################
             stage_ids = po.rubrique_id and po.rubrique_id.stage_ids or False
-            #raise osv.except_osv(_("jjjjjjjj"),_("%s")%stage_ids)
-            print "11111111111111111111111"
-
+            if po.internal_state and po.internal_state.is_start:
+                raise osv.except_osv(_('Attention'),_("Cette demande de prix nécessite une validation interne"))
             ####################FIN KAZACUBE###################"
         self.pool.get('purchase.order.line').action_confirm(cr, uid, todo, context)
         for id in ids:
             self.write(cr, uid, [id], {'state' : 'confirmed', 'validator' : uid})
         return True
 
-    def wkf_approve_order(self, cr, uid, ids, context=None):
-        print "22222222222222222222222222"
-        from openerp.osv import fields, osv
-        self.write(cr, uid, ids, {'state': 'approved', 'date_approve': fields.date.context_today(self,cr,uid,context=context)})
-        return True
+    # def wkf_approve_order(self, cr, uid, ids, context=None):
+    #     print "22222222222222222222222222"
+    #     from openerp.osv import fields, osv
+    #     self.write(cr, uid, ids, {'state': 'approved', 'date_approve': fields.date.context_today(self,cr,uid,context=context)})
+    #     return True
 
-    #def first_validate_order(self):
-
+    @api.multi
+    def first_validation(self):
+        if not self.rubrique_id:
+            return
+        end_id = False
+        for stage in self.rubrique_id.stage_ids:
+            if stage.is_end:
+                end_id = stage.id
+        self.internal_state=end_id
 
     @api.onchange('rubrique_id')
     def get_selection(self):
         rubrique = self.rubrique_id
+        ids = []
+        start_id = False
+        for stage in rubrique.stage_ids:
+            ids.append(stage.id)
+            if stage.is_start:
+                start_id = stage.id
         ids = [x.id for x in rubrique.stage_ids]
         domain=[('id','in',tuple(ids))]
+        self.internal_state = start_id
         return {'domain':{'internal_state':domain}}
+
+
+
 purchase_order()
 
 class purchase_order_stage(osv.osv):
@@ -101,7 +142,8 @@ class purchase_order_stage(osv.osv):
     _order = 'sequence asc'
 
     name = fields.Char(string="Libellé", required=True)
-    code = fields.Char(string="code", required=True)
+    is_start = fields.Boolean(string="Début ?")
+    is_end = fields.Boolean(string="Fin ?")
     sequence = fields.Integer(string="Sequence", required=True)
     rubrique_ids = fields.Many2many(comodel_name="rubrique.rubrique", relation="rubrique_stage_rel", column1="rubrique_id", column2="stage_id", string="Rubriques", )
 
