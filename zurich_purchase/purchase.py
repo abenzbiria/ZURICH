@@ -4,7 +4,7 @@
 
 
 from openerp.osv import  osv,fields
-from openerp import models ,fields ,api, _
+from openerp import models ,fields ,api, _,exceptions
 
 from openerp.tools.translate import _
 from datetime import datetime
@@ -34,24 +34,64 @@ class purchase_requisition(osv.osv):
     responsible_id = fields.Many2one(string="Responsable", comodel_name="res.users")
     department_id = fields.Many2one(comodel_name="hr.department",required=True,string="Département origine")
 
+    @api.onchange('department_id')
+    def onchange_department_id(self):
+        user_id = False
+        if self.department_id:
+            if self.department_id.manager_id:
+                if self.department_id.manager_id.user_id:
+                    user_id = self.department_id.manager_id.user_id.id
+        self.responsible_id = user_id
+
+
+
 class purchase_order(osv.osv):
 
     _inherit = "purchase.order"
 
 
-    state = fields.Many2one(string="Statut", comodel_name="purchase.order.stage",default=11)
-    rubrique_id = fields.Many2one(comodel_name="rubrique.rubrique", string="Rubrique",default=1)
+    internal_state = fields.Many2one(string="Statut Interne", comodel_name="purchase.order.stage",domain="[('rubrique_ids','=',rubrique_id)]")
+    rubrique_id = fields.Many2one(comodel_name="rubrique.rubrique", string="Rubrique")
 
 
-    def onchange_rubrique_id(self,cr,uid,ids,rubrique_id,context=None):
-        if not rubrique_id:
-            return {}
-        rubrique = self.pool.get('rubrique.rubrique').browse(cr,uid,rubrique_id)
+    def wkf_confirm_order(self, cr, uid, ids, context=None):
+        todo = []
+        for po in self.browse(cr, uid, ids, context=context):
+            if not any(line.state != 'cancel' for line in po.order_line):
+                raise osv.except_osv(_('Error!'),_('You cannot confirm a purchase order without any purchase order line.'))
+            if po.invoice_method == 'picking' and not any([l.product_id and l.product_id.type in ('product', 'consu') and l.state != 'cancel' for l in po.order_line]):
+                raise osv.except_osv(
+                    _('Error!'),
+                    _("You cannot confirm a purchase order with Invoice Control Method 'Based on incoming shipments' that doesn't contain any stockable item."))
+            for line in po.order_line:
+                if line.state=='draft':
+                    todo.append(line.id)
+            ######################KAZACUBE##################
+            stage_ids = po.rubrique_id and po.rubrique_id.stage_ids or False
+            #raise osv.except_osv(_("jjjjjjjj"),_("%s")%stage_ids)
+            print "11111111111111111111111"
+
+            ####################FIN KAZACUBE###################"
+        self.pool.get('purchase.order.line').action_confirm(cr, uid, todo, context)
+        for id in ids:
+            self.write(cr, uid, [id], {'state' : 'confirmed', 'validator' : uid})
+        return True
+
+    def wkf_approve_order(self, cr, uid, ids, context=None):
+        print "22222222222222222222222222"
+        from openerp.osv import fields, osv
+        self.write(cr, uid, ids, {'state': 'approved', 'date_approve': fields.date.context_today(self,cr,uid,context=context)})
+        return True
+
+    #def first_validate_order(self):
+
+
+    @api.onchange('rubrique_id')
+    def get_selection(self):
+        rubrique = self.rubrique_id
         ids = [x.id for x in rubrique.stage_ids]
         domain=[('id','in',tuple(ids))]
-        print '2222222',rubrique.name,domain
-        return {'domain':{'state':domain}}
-
+        return {'domain':{'internal_state':domain}}
 purchase_order()
 
 class purchase_order_stage(osv.osv):
