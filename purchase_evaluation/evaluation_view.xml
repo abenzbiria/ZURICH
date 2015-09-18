@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <openerp>
     <data>
-            
-            <record model="ir.ui.view" id="purchase_order_evaluation_form_inherit">
-                <field name="name">purchase.order.evaluation.iniherit.form</field>
-                <field name="model">purchase.order</field>
+
+            <record model="ir.ui.view" id="account_invoice_evaluation_form_inherit">
+                <field name="name">account.invoice.evaluation.iniherit.form</field>
+                <field name="model">account.invoice</field>
                 <field name="type">form</field>
-                <field name="inherit_id" ref="purchase.purchase_order_form"/>
+                <field name="inherit_id" ref="account.invoice_supplier_form"/>
                 <field name="arch" type="xml">
-                       <xpath expr="//page[@string='Deliveries &amp; Invoices']" position="after">
+                       <xpath expr="//page[@string='Payments']" position="after">
 
                             <!-- page string="Evaluation" attrs="{'invisible':[('state','not in','approved')]}" -->
                             <page string="Evaluation">

@@ -37,17 +37,15 @@ class res_partner_evaluation(osv.osv):
     }
 
 
-class purchase_order_evaluation(osv.osv):
-    _name = 'purchase.order.evaluation'
+class account_invoice_evaluation(osv.osv):
+    _name = 'account.invoice.evaluation'
 
     _columns = {
         'evaluation_id':fields.many2one('purchase.evaluation','Evaluation'),
-        'purchase_id':fields.many2one('purchase.order','Bon commande'),
+        'invoice_id':fields.many2one('account.invoice','Facture'),
         'note':fields.integer('Note'),
 
     }
-
-purchase_order_evaluation()
 
 
 class purchase_evaluation(osv.osv):
@@ -70,64 +68,3 @@ class res_partner(osv.osv):
     }
 
 res_partner()
-
-
-class purchase_order(osv.osv):
-    _inherit = 'purchase.order'
-
-    def wkf_confirm_order(self, cr, uid, ids, context=None):
-        todo = []
-        for po in self.browse(cr, uid, ids, context=context):
-            if not po.order_line:
-                raise osv.except_osv(_('Error!'),_('You cannot confirm a purchase order without any purchase order line.'))
-            if po.invoice_method == 'picking' and not any([l.product_id and l.product_id.type in ('product', 'consu') for l in po.order_line]):
-                raise osv.except_osv(
-                    _('Error!'),
-                    _("You cannot confirm a purchase order with Invoice Control Method 'Based on incoming shipments' that doesn't contain any stockable item."))
-            for line in po.order_line:
-                if line.state=='draft':
-                    todo.append(line.id)
-            ######################KAZACUBE##################
-            stage_ids = po.rubrique_id and po.rubrique_id.stage_ids or False
-            if po.internal_state and po.internal_state.is_start:
-                raise osv.except_osv(_('Attention'),_("Cette demande de prix nécessite une validation interne"))
-            ####################FIN KAZACUBE###################"
-            for eval in po.evaluation_ids:
-                if eval.note<0 or eval.note>10:
-                    raise osv.except_osv(_('Error!'),_('Note de critère non autorisé (note comprise entre 0 et 10) .'))
-
-            res_eval_obj=self.pool.get('res.partner.evaluation')
-            res_obj=self.pool.get('res.partner')
-            vals={}
-            j=[]
-            for eval in po.evaluation_ids:
-                if po.partner_id.evaluation_ids:
-                    for eval_par in po.partner_id.evaluation_ids:
-                        if  eval_par.evaluation_id.id==eval.evaluation_id.id :
-                            res_eval_obj.write(cr,uid,eval_par.id,{'note':(eval_par.note+eval.note)/2})
-                        else:
-                            vals['partner_id']=po.partner_id.id
-                            vals['evaluation_id']=eval.evaluation_id.id
-                            vals['note']=eval.note
-                            res_eval_obj.create(cr,uid,vals)
-
-                else:
-                    vals['partner_id']=po.partner_id.id
-                    vals['evaluation_id']=eval.evaluation_id.id
-                    vals['note']=eval.note
-                    res_eval_obj.create(cr,uid,vals)
-
-        self.pool.get('purchase.order.line').action_confirm(cr, uid, todo, context)
-        for id in ids:
-            self.write(cr, uid, [id], {'state' : 'confirmed', 'validator' : uid})
-
-        return True
-
-    _columns = {
-        'evaluation_ids':fields.one2many('purchase.order.evaluation', 'purchase_id', "Lignes d'évaluation"),
-
-
-                }
-
-
-purchase_order()
