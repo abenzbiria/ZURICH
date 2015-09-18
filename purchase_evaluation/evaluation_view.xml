@@ -9,8 +9,6 @@
                 <field name="inherit_id" ref="account.invoice_supplier_form"/>
                 <field name="arch" type="xml">
                        <xpath expr="//page[@string='Payments']" position="after">
-
-                            <!-- page string="Evaluation" attrs="{'invisible':[('state','not in','approved')]}" -->
                             <page string="Evaluation">
                             <field name="evaluation_ids">
                                 <tree string="Purchase Evaluation Lines" editable="bottom">

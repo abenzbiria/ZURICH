@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="invoice_supplier_form_inherit" model="ir.ui.view">
+            <field name="name">supplier.invoice.form.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='move_id']" position="before">
+                    <field name="department_id" />
+                    <field name="demandeur_id" />
+                    <field name="responsible_id" />
+                    <field name="budget_id" />
+                    <field name="rubrique_id" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="invoice_tree_inherit" model="ir.ui.view">
+            <field name="name">supplier.invoice.tree.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="department_id" invisible="context.get('type',True) in ('out_invoice','out_refund')"/>
+                    <field name="budget_id" invisible="context.get('type',True) in ('out_invoice','out_refund')"/>
+                    <field name="rubrique_id" invisible="context.get('type',True) in ('out_invoice','out_refund')"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_invoice_filter_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.select.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                   <xpath expr="//filter[@string='Due Month']" position="after">
+                       <separator/>
+                       <filter string="Departement" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>
+                       <filter string="Budget" icon="terp-personal" domain="[]" context="{'group_by':'budget_id'}"/>
+                       <filter string="Rubrique" icon="terp-personal" domain="[]" context="{'group_by':'rubrique_id'}"/>
+                </xpath>
+            </field>
+        </record>
+
+
+
+    </data>
+</openerp>

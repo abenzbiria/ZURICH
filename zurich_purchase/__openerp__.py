@@ -40,7 +40,7 @@
 """
 , "category"    : "Purchase"
 , "depends"     : 
-    [ "purchase","purchase_requisition","hr","purchase_double_validation"
+    [ "purchase","purchase_requisition","hr","purchase_double_validation","account"
     ]
 , "init_xml"    : []
 , "demo_xml"    : []
@@ -49,7 +49,8 @@
     'purchase_view.xml',
       'rubrique_view.xml',
       'budget_view.xml',
-'purchase_requisition_view.xml',
+    'purchase_requisition_view.xml',
+    'invoice_view.xml',
 
     ]
 , "test"        : []

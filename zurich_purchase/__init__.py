@@ -33,3 +33,4 @@
 import purchase
 import rubrique
 import budget
+import invoice
