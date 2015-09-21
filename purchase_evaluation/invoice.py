@@ -36,32 +36,22 @@ class account_invoice(models.Model):
     def invoice_validate(self):
 
         res_eval_obj=self.env['res.partner.evaluation']
+        acc_eval_obj=self.env['account.invoice.evaluation']
         res_obj=self.env['res.partner']
         vals={}
-
         for eval in self.evaluation_ids:
             if eval.note<0 or eval.note>10:
                 raise except_orm(_('Error!'), _("Note de critère non autorisé (note comprise entre 0 et 10) ."))
-
-
-        for eval in self.evaluation_ids:
-            print eval
-            if self.partner_id.evaluation_ids:
-                for eval_par in self.partner_id.evaluation_ids:
-                    if  eval_par.evaluation_id.id==eval.evaluation_id.id :
-                        eval_par.write({'note':(eval_par.note+eval.note)/2})
-                    else:
-                        vals['partner_id']=self.partner_id.id
-                        vals['evaluation_id']=eval.evaluation_id.id
-                        vals['note']=eval.note
-                        res_eval_obj.create(vals)
-
+            res_eval_ids = res_eval_obj.search([('partner_id','=',self.partner_id.id),('evaluation_id','=',eval.evaluation_id.id)])
+            if res_eval_ids:
+                print 'I am old'
+                res_eval_ids.note = (res_eval_ids.note+eval.note)/2
             else:
+                print 'I am new'
                 vals['partner_id']=self.partner_id.id
                 vals['evaluation_id']=eval.evaluation_id.id
                 vals['note']=eval.note
                 res_eval_obj.create(vals)
-
-            return self.write({'state': 'open'})
+        return self.write({'state': 'open'})
 
 account_invoice()
