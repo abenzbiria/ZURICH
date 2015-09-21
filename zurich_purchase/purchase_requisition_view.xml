@@ -94,7 +94,7 @@
                 </xpath>
 
                 <xpath expr="//button[@string='Request a Quotation']" position="attributes">
-                   <attribute name="groups">purchase_requisition.group_purchase_requisition_manager</attribute>
+                   <attribute name="groups">purchase.group_purchase_manager,purchase.group_purchase_user</attribute>
                 </xpath>
 
 
