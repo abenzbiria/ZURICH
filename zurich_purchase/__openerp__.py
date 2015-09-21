@@ -45,6 +45,7 @@
 , "init_xml"    : []
 , "demo_xml"    : []
 , "update_xml"  : [
+    'security/groups.xml',
     'ir.model.access.csv',
     'purchase_view.xml',
       'rubrique_view.xml',

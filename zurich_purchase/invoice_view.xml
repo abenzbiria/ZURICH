@@ -7,6 +7,7 @@
             <field name="inherit_id" ref="account.invoice_supplier_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='move_id']" position="before">
+                    <field name="requisition_id"/>
                     <field name="department_id" />
                     <field name="demandeur_id" />
                     <field name="responsible_id" />
@@ -22,6 +23,7 @@
             <field name="inherit_id" ref="account.invoice_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='origin']" position="after">
+                    <field name="requisition_id" invisible="context.get('type',True) in ('out_invoice','out_refund')"/>
                     <field name="department_id" invisible="context.get('type',True) in ('out_invoice','out_refund')"/>
                     <field name="budget_id" invisible="context.get('type',True) in ('out_invoice','out_refund')"/>
                     <field name="rubrique_id" invisible="context.get('type',True) in ('out_invoice','out_refund')"/>
@@ -36,6 +38,7 @@
             <field name="arch" type="xml">
                    <xpath expr="//filter[@string='Due Month']" position="after">
                        <separator/>
+                       <filter string="Demande interne" icon="terp-personal" domain="[]" context="{'group_by':'requisition_id'}"/>
                        <filter string="Departement" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>
                        <filter string="Budget" icon="terp-personal" domain="[]" context="{'group_by':'budget_id'}"/>
                        <filter string="Rubrique" icon="terp-personal" domain="[]" context="{'group_by':'rubrique_id'}"/>

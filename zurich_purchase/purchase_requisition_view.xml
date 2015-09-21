@@ -92,13 +92,9 @@
                         </group>
                     </page>
                 </xpath>
-
                 <xpath expr="//button[@string='Request a Quotation']" position="attributes">
                    <attribute name="groups">purchase.group_purchase_manager,purchase.group_purchase_user</attribute>
                 </xpath>
-
-
-
             </field>
         </record>
 
@@ -146,8 +142,14 @@
                        <field name="responsible_id" string="Responsable"/>
                         <field name="user_id" string="Demandeur"/>
                     </xpath>
+
                     <xpath expr="//filter[@string='Responsible']" position="attributes">
                        <attribute name="context">{'group_by':'responsible_id'}</attribute>
+                    </xpath>
+                    <xpath expr="//filter[@string='Source']" position="replace">
+                    </xpath>
+                    <xpath expr="//filter[@string='Closed Bids']" position="attributes">
+                           <attribute name="string">Sélection des offres</attribute>
                     </xpath>
                    <xpath expr="//filter[@string='Responsible']" position="after">
                        <filter string="Demandeur" icon="terp-personal" domain="[]" context="{'group_by':'user_id'}"/>
@@ -167,7 +169,7 @@
 
          <record model="ir.actions.act_window" id="purchase_requisition.action_purchase_requisition">
         <field name="name">Demande internes</field>
-             <field name="context">{"search_default_responsible_id":uid}</field>
+             <field name="context">{}</field>
         </record>
 
     </data>

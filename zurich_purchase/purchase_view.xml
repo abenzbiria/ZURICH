@@ -59,6 +59,15 @@
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//button[@id='draft_confirm']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_manager,purchase.group_purchase_super_manager</attribute>
+                </xpath>
+                <xpath expr="//button[@id='bid_confirm']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_manager,purchase.group_purchase_super_manager</attribute>
+                </xpath>
+                <xpath expr="//button[@name='purchase_approve']" position="attributes">
+                    <attribute name="groups">zurich_purchase.group_purchase_super_manager</attribute>
+                </xpath>
                 <xpath expr="//field[@name='company_id']" position="before">
                     <field name="demandeur_id" />
                     <field name="department_id" />
@@ -70,11 +79,11 @@
                 <xpath expr="//field[@name='state']" position="after">
                     <field name="internal_state" invisible="1"/>
                 </xpath>
-                <xpath expr="//button[@id='draft_confirm']" position="before">
+                <!--xpath expr="//button[@id='draft_confirm']" position="before">
                     <button name="first_validation" attrs="{'invisible': [('is_validate_visible','=',False)]}"
                             groups="purchase.group_purchase_manager"
                             string="Validation Interne" type="object"/>
-                </xpath>
+                </xpath-->
             </field>
         </record>
 
@@ -97,6 +106,7 @@
             <field name="inherit_id" ref="purchase.view_request_for_quotation_filter"/>
             <field name="arch" type="xml">
                    <xpath expr="//filter[@string='Supplier']" position="after">
+                       <filter string="Demande interne" icon="terp-personal" domain="[]" context="{'group_by':'requisition_id'}"/>
                        <filter string="Departement" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>
                        <filter string="Budget" icon="terp-personal" domain="[]" context="{'group_by':'budget_id'}"/>
                        <filter string="Rubrique" icon="terp-personal" domain="[]" context="{'group_by':'rubrique_id'}"/>
@@ -110,6 +120,7 @@
             <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
             <field name="arch" type="xml">
                    <xpath expr="//filter[@string='Supplier']" position="after">
+                       <filter string="Document d'origine" icon="terp-personal" domain="[]" context="{'group_by':'origin'}"/>
                        <filter string="Departement" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>
                        <filter string="Budget" icon="terp-personal" domain="[]" context="{'group_by':'budget_id'}"/>
                        <filter string="Rubrique" icon="terp-personal" domain="[]" context="{'group_by':'rubrique_id'}"/>

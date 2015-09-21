@@ -212,6 +212,7 @@ class purchase_order(osv.osv):
             'department_id':order.department_id and order.department_id.id or False,
             'demandeur_id':order.demandeur_id and order.demandeur_id.id or False,
             'responsible_id':order.responsible_id and order.responsible_id.id or False,
+            'requisition_id':order.requisition_id and order.requisition_id.id or False,
         }
 
     def wkf_confirm_order(self, cr, uid, ids, context=None):
@@ -224,8 +225,8 @@ class purchase_order(osv.osv):
                     _('Error!'),
                     _("You cannot confirm a purchase order with Invoice Control Method 'Based on incoming shipments' that doesn't contain any stockable item."))
             ######################KAZACUBE##################
-            if po.internal_state and po.internal_state.is_start:
-                raise osv.except_osv(_('Attention'),_("Cette demande de prix nécessite une validation interne"))
+            # if po.internal_state and po.internal_state.is_start:
+            #     raise osv.except_osv(_('Attention'),_("Cette demande de prix nécessite une validation interne"))
             ####################FIN KAZACUBE###################"
             for line in po.order_line:
                 if line.state=='draft':
