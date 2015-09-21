@@ -30,8 +30,6 @@ class account_invoice(models.Model):
 
     evaluation_ids = fields.One2many('account.invoice.evaluation', 'invoice_id', string="Lignes d'évaluation")
 
-
-
     @api.multi
     def invoice_validate(self):
 
